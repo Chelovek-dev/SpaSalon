@@ -3,8 +3,228 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="Views/LoginWindow.xaml">
     <Application.Resources>
-        <Style TargetType="Button">
+        <!-- Цветовая палитра -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#2C3E50"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#3498DB"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#27AE60"/>
+        <SolidColorBrush x:Key="DangerColor" Color="#E74C3C"/>
+        <SolidColorBrush x:Key="WarningColor" Color="#E67E22"/>
+        <SolidColorBrush x:Key="InfoColor" Color="#1ABC9C"/>
+        <SolidColorBrush x:Key="PurpleColor" Color="#8E44AD"/>
+        <SolidColorBrush x:Key="DarkColor" Color="#34495E"/>
+        <SolidColorBrush x:Key="LightColor" Color="#ECF0F1"/>
+        <SolidColorBrush x:Key="GrayColor" Color="#95A5A6"/>
+
+        <!-- Тени -->
+        <DropShadowEffect x:Key="ShadowEffect" BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+
+        <!-- Стиль для кнопок -->
+        <Style TargetType="Button" x:Key="ModernButton">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Margin" Value="5"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6"
+                                BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource DarkColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="{StaticResource GrayColor}"/>
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Кнопка-действие -->
+        <Style TargetType="Button" x:Key="ActionButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+        </Style>
+
+        <!-- Кнопка успеха -->
+        <Style TargetType="Button" x:Key="SuccessButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{StaticResource SuccessColor}"/>
+        </Style>
+
+        <!-- Кнопка опасности -->
+        <Style TargetType="Button" x:Key="DangerButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{StaticResource DangerColor}"/>
+        </Style>
+
+        <!-- Кнопка предупреждения -->
+        <Style TargetType="Button" x:Key="WarningButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{StaticResource WarningColor}"/>
+        </Style>
+
+        <!-- Кнопка информация -->
+        <Style TargetType="Button" x:Key="InfoButton" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="{StaticResource InfoColor}"/>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#D5D8DC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="10,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для PasswordBox -->
+        <Style TargetType="PasswordBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#D5D8DC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="10,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="BorderBrush" Value="#D5D8DC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Стиль для DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#D5D8DC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Стиль для DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="AlternatingRowBackground" Value="#F8F9FA"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="RowHeight" Value="40"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Стиль для заголовков DataGrid -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <!-- Стиль для TabControl -->
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="{StaticResource LightColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Стиль для TabItem -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource GrayColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" Background="{TemplateBinding Background}" 
+                                BorderThickness="0,0,0,2" BorderBrush="Transparent"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="ContentSite"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                <Setter Property="Foreground" Value="{StaticResource SecondaryColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Карточка -->
+        <Style TargetType="Border" x:Key="CardBorder">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Effect" Value="{StaticResource ShadowEffect}"/>
         </Style>
     </Application.Resources>
 </Application>

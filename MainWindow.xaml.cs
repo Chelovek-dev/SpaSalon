@@ -19,8 +19,7 @@ namespace SpaSalon.Views
             currentUser = user;
 
             // Отображаем информацию о пользователе
-            string roleDisplay = currentUser.Role == "Admin" ? "Администратор" :
-                                 currentUser.Role == "Storekeeper" ? "Кладовщик" : "Мастер";
+            string roleDisplay = currentUser.Role == "Admin" ? "Администратор" : "Мастер";
             UserInfoText.Text = $"{currentUser.FullName} ({roleDisplay})";
 
             // НАСТРОЙКА ПРАВ ДОСТУПА
@@ -29,6 +28,7 @@ namespace SpaSalon.Views
             LoadClients();
             LoadServices();
             LoadAppointments(null);
+            ShowClientsPanel(); // Показываем клиентов по умолчанию
 
             // Записываем в журнал
             journalRepository.AddEntry(user.Id, user.FullName, "Вход в систему",
@@ -40,68 +40,91 @@ namespace SpaSalon.Views
         /// </summary>
         private void ConfigureAccessRights()
         {
-            switch (currentUser.Role)
+            if (currentUser.Role == "Admin")
             {
-                case "Admin":
-                    // Администратор - полный доступ ко всему
-                    AddClientButton.Visibility = Visibility.Visible;
-                    EditClientButton.Visibility = Visibility.Visible;
-                    DeleteClientButton.Visibility = Visibility.Visible;
-                    RefreshClientsButton.Visibility = Visibility.Visible;
-                    AddServiceButton.Visibility = Visibility.Visible;
-                    RefreshServicesButton.Visibility = Visibility.Visible;
-                    AddAppointmentButton.Visibility = Visibility.Visible;
-                    EditAppointmentButton.Visibility = Visibility.Visible;
-                    CancelAppointmentButton.Visibility = Visibility.Visible;
-                    ConfirmAppointmentButton.Visibility = Visibility.Visible;
-                    CompleteAppointmentButton.Visibility = Visibility.Visible;
-                    RefreshAppointmentsButton.Visibility = Visibility.Visible;
-                    SuppliersButton.Visibility = Visibility.Visible;
-                    PurchasesButton.Visibility = Visibility.Visible;
-                    RevenueReportButton.Visibility = Visibility.Visible;
-                    ScheduleButton.Visibility = Visibility.Visible;
-                    break;
-
-                case "Master":
-                    // Мастер - только просмотр и отметка выполнения
-                    AddClientButton.Visibility = Visibility.Collapsed;
-                    EditClientButton.Visibility = Visibility.Collapsed;
-                    DeleteClientButton.Visibility = Visibility.Collapsed;
-                    RefreshClientsButton.Visibility = Visibility.Visible;
-                    AddServiceButton.Visibility = Visibility.Collapsed;
-                    RefreshServicesButton.Visibility = Visibility.Visible;
-                    AddAppointmentButton.Visibility = Visibility.Collapsed;
-                    EditAppointmentButton.Visibility = Visibility.Collapsed;
-                    CancelAppointmentButton.Visibility = Visibility.Collapsed;
-                    ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
-                    CompleteAppointmentButton.Visibility = Visibility.Visible;
-                    RefreshAppointmentsButton.Visibility = Visibility.Visible;
-                    SuppliersButton.Visibility = Visibility.Collapsed;
-                    PurchasesButton.Visibility = Visibility.Collapsed;
-                    RevenueReportButton.Visibility = Visibility.Collapsed;
-                    ScheduleButton.Visibility = Visibility.Visible; // Мастер видит свой график
-                    break;
-
-                default:
-                    // Кладовщик и другие - только просмотр
-                    AddClientButton.Visibility = Visibility.Collapsed;
-                    EditClientButton.Visibility = Visibility.Collapsed;
-                    DeleteClientButton.Visibility = Visibility.Collapsed;
-                    RefreshClientsButton.Visibility = Visibility.Visible;
-                    AddServiceButton.Visibility = Visibility.Collapsed;
-                    RefreshServicesButton.Visibility = Visibility.Visible;
-                    AddAppointmentButton.Visibility = Visibility.Collapsed;
-                    EditAppointmentButton.Visibility = Visibility.Collapsed;
-                    CancelAppointmentButton.Visibility = Visibility.Collapsed;
-                    ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
-                    CompleteAppointmentButton.Visibility = Visibility.Collapsed;
-                    RefreshAppointmentsButton.Visibility = Visibility.Visible;
-                    SuppliersButton.Visibility = Visibility.Collapsed;
-                    PurchasesButton.Visibility = Visibility.Collapsed;
-                    RevenueReportButton.Visibility = Visibility.Collapsed;
-                    ScheduleButton.Visibility = Visibility.Collapsed;
-                    break;
+                // Администратор - полный доступ ко всему
+                AddClientButton.Visibility = Visibility.Visible;
+                EditClientButton.Visibility = Visibility.Visible;
+                DeleteClientButton.Visibility = Visibility.Visible;
+                RefreshClientsButton.Visibility = Visibility.Visible;
+                AddServiceButton.Visibility = Visibility.Visible;
+                RefreshServicesButton.Visibility = Visibility.Visible;
+                AddAppointmentButton.Visibility = Visibility.Visible;
+                EditAppointmentButton.Visibility = Visibility.Visible;
+                CancelAppointmentButton.Visibility = Visibility.Visible;
+                ConfirmAppointmentButton.Visibility = Visibility.Visible;
+                CompleteAppointmentButton.Visibility = Visibility.Visible;
+                RefreshAppointmentsButton.Visibility = Visibility.Visible;
+                SuppliersButton.Visibility = Visibility.Visible;
+                PurchasesButton.Visibility = Visibility.Visible;
+                RevenueReportButton.Visibility = Visibility.Visible;
+                ScheduleButton.Visibility = Visibility.Visible;
+                MaterialReportButton.Visibility = Visibility.Visible;
             }
+            else // Master
+            {
+                // Мастер - только просмотр и отметка выполнения
+                AddClientButton.Visibility = Visibility.Collapsed;
+                EditClientButton.Visibility = Visibility.Collapsed;
+                DeleteClientButton.Visibility = Visibility.Collapsed;
+                RefreshClientsButton.Visibility = Visibility.Visible;
+                AddServiceButton.Visibility = Visibility.Collapsed;
+                RefreshServicesButton.Visibility = Visibility.Visible;
+                AddAppointmentButton.Visibility = Visibility.Collapsed;
+                EditAppointmentButton.Visibility = Visibility.Collapsed;
+                CancelAppointmentButton.Visibility = Visibility.Collapsed;
+                ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
+                CompleteAppointmentButton.Visibility = Visibility.Visible;
+                RefreshAppointmentsButton.Visibility = Visibility.Visible;
+                SuppliersButton.Visibility = Visibility.Collapsed;
+                PurchasesButton.Visibility = Visibility.Collapsed;
+                RevenueReportButton.Visibility = Visibility.Collapsed;
+                ScheduleButton.Visibility = Visibility.Visible;
+                MaterialReportButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        // ==================== НАВИГАЦИЯ ====================
+
+        private void ShowClientsPanel()
+        {
+            CurrentTabTitle.Text = "Клиенты";
+            ClientsPanel.Visibility = Visibility.Visible;
+            ServicesPanel.Visibility = Visibility.Collapsed;
+            AppointmentsPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowServicesPanel()
+        {
+            CurrentTabTitle.Text = "Услуги";
+            ClientsPanel.Visibility = Visibility.Collapsed;
+            ServicesPanel.Visibility = Visibility.Visible;
+            AppointmentsPanel.Visibility = Visibility.Collapsed;
+            LoadServices();
+        }
+
+        private void ShowAppointmentsPanel()
+        {
+            CurrentTabTitle.Text = "Записи";
+            ClientsPanel.Visibility = Visibility.Collapsed;
+            ServicesPanel.Visibility = Visibility.Collapsed;
+            AppointmentsPanel.Visibility = Visibility.Visible;
+            LoadAppointments(FilterDatePicker.SelectedDate);
+        }
+
+        private void NavClientsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowClientsPanel();
+        }
+
+        private void NavServicesButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowServicesPanel();
+        }
+
+        private void NavAppointmentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAppointmentsPanel();
         }
 
         // ==================== КЛИЕНТЫ ====================
@@ -477,7 +500,6 @@ namespace SpaSalon.Views
                     journalRepository.AddEntry(currentUser.Id, currentUser.FullName,
                         "Выполнение записи", $"Выполнена запись #{selected.Id} для {selected.ClientName}");
 
-                    // Открываем окно учёта расхода материалов
                     var materialWindow = new MaterialConsumptionWindow(selected);
                     materialWindow.Owner = this;
                     materialWindow.ShowDialog();

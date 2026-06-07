@@ -56,10 +56,9 @@ namespace SpaSalon.Repositories
             if (string.IsNullOrEmpty(position)) return "Master";
 
             position = position.ToLower();
+            // Только Администратор или Мастер
             if (position.Contains("администратор") || position.Contains("admin") || position.Contains("старший"))
                 return "Admin";
-            if (position.Contains("кладовщик") || position.Contains("storekeeper"))
-                return "Storekeeper";
             return "Master";
         }
 
@@ -116,7 +115,6 @@ namespace SpaSalon.Repositories
                 throw new Exception($"Ошибка получения пользователя: {ex.Message}", ex);
             }
         }
-        // Добавьте этот метод в конец класса UserRepository
 
         public List<User> GetAllMasters()
         {
