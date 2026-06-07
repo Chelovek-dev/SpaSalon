@@ -1,0 +1,38 @@
+﻿<Window x:Class="SpaSalon.Views.MaterialReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Отчёт по материалам" 
+        Height="500" 
+        Width="800"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Складские остатки материалов" FontSize="20" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- Таблица материалов -->
+        <DataGrid x:Name="MaterialsDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="200"/>
+                <DataGridTextColumn Header="Ед.изм." Binding="{Binding Unit}" Width="80"/>
+                <DataGridTextColumn Header="Остаток" Binding="{Binding QuantityDisplay}" Width="100"/>
+                <DataGridTextColumn Header="Срок годности" Binding="{Binding ExpirationDays}" Width="100"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding StockStatus}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button x:Name="RefreshButton" Content="Обновить" Width="120" Height="35" 
+                    Background="#3498DB" Foreground="White" Click="RefreshButton_Click"/>
+            <Button x:Name="CloseButton" Content="Закрыть" Width="120" Height="35" 
+                    Margin="10,0" Background="#95A5A6" Foreground="White" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

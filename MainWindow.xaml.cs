@@ -35,11 +35,15 @@ namespace SpaSalon.Views
                 $"Пользователь {user.FullName} открыл главное окно. Роль: {roleDisplay}");
         }
 
+        /// <summary>
+        /// Настройка видимости элементов в зависимости от роли пользователя
+        /// </summary>
         private void ConfigureAccessRights()
         {
             switch (currentUser.Role)
             {
                 case "Admin":
+                    // Администратор - полный доступ ко всему
                     AddClientButton.Visibility = Visibility.Visible;
                     EditClientButton.Visibility = Visibility.Visible;
                     DeleteClientButton.Visibility = Visibility.Visible;
@@ -52,9 +56,14 @@ namespace SpaSalon.Views
                     ConfirmAppointmentButton.Visibility = Visibility.Visible;
                     CompleteAppointmentButton.Visibility = Visibility.Visible;
                     RefreshAppointmentsButton.Visibility = Visibility.Visible;
+                    SuppliersButton.Visibility = Visibility.Visible;
+                    PurchasesButton.Visibility = Visibility.Visible;
+                    RevenueReportButton.Visibility = Visibility.Visible;
+                    ScheduleButton.Visibility = Visibility.Visible;
                     break;
 
                 case "Master":
+                    // Мастер - только просмотр и отметка выполнения
                     AddClientButton.Visibility = Visibility.Collapsed;
                     EditClientButton.Visibility = Visibility.Collapsed;
                     DeleteClientButton.Visibility = Visibility.Collapsed;
@@ -67,9 +76,14 @@ namespace SpaSalon.Views
                     ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
                     CompleteAppointmentButton.Visibility = Visibility.Visible;
                     RefreshAppointmentsButton.Visibility = Visibility.Visible;
+                    SuppliersButton.Visibility = Visibility.Collapsed;
+                    PurchasesButton.Visibility = Visibility.Collapsed;
+                    RevenueReportButton.Visibility = Visibility.Collapsed;
+                    ScheduleButton.Visibility = Visibility.Visible; // Мастер видит свой график
                     break;
 
                 default:
+                    // Кладовщик и другие - только просмотр
                     AddClientButton.Visibility = Visibility.Collapsed;
                     EditClientButton.Visibility = Visibility.Collapsed;
                     DeleteClientButton.Visibility = Visibility.Collapsed;
@@ -82,11 +96,16 @@ namespace SpaSalon.Views
                     ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
                     CompleteAppointmentButton.Visibility = Visibility.Collapsed;
                     RefreshAppointmentsButton.Visibility = Visibility.Visible;
+                    SuppliersButton.Visibility = Visibility.Collapsed;
+                    PurchasesButton.Visibility = Visibility.Collapsed;
+                    RevenueReportButton.Visibility = Visibility.Collapsed;
+                    ScheduleButton.Visibility = Visibility.Collapsed;
                     break;
             }
         }
 
-        // КЛИЕНТЫ
+        // ==================== КЛИЕНТЫ ====================
+
         private void LoadClients()
         {
             var clients = clientRepository.GetAllClients();
@@ -215,7 +234,8 @@ namespace SpaSalon.Views
             SearchTextBox.Text = "";
         }
 
-        // УСЛУГИ
+        // ==================== УСЛУГИ ====================
+
         private void LoadServices()
         {
             var services = serviceRepository.GetAllServices();
@@ -255,7 +275,8 @@ namespace SpaSalon.Views
             LoadServices();
         }
 
-        // ЗАПИСИ
+        // ==================== ЗАПИСИ ====================
+
         private void LoadAppointments(DateTime? filterDate = null)
         {
             if (filterDate.HasValue)
@@ -474,18 +495,14 @@ namespace SpaSalon.Views
             LoadAppointments(FilterDatePicker.SelectedDate);
         }
 
-        private void FilterDatePicker_SelectedDateChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            LoadAppointments(FilterDatePicker.SelectedDate);
-        }
-
         private void ShowAllAppointmentsButton_Click(object sender, RoutedEventArgs e)
         {
             FilterDatePicker.SelectedDate = null;
             LoadAppointments(null);
         }
 
-        // ОТЧЁТЫ И ЖУРНАЛ
+        // ==================== ОТЧЁТЫ И ДОПОЛНИТЕЛЬНЫЕ ОКНА ====================
+
         private void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
             var reportWindow = new ReportWindow();
@@ -500,7 +517,61 @@ namespace SpaSalon.Views
             journalWindow.ShowDialog();
         }
 
-        // ПРОЧЕЕ
+        private void SuppliersButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для управления поставщиками!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var supplierWindow = new SupplierWindow();
+            supplierWindow.Owner = this;
+            supplierWindow.ShowDialog();
+        }
+
+        private void PurchasesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для управления закупками!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var purchaseWindow = new PurchaseWindow();
+            purchaseWindow.Owner = this;
+            purchaseWindow.ShowDialog();
+        }
+
+        private void MaterialReportButton_Click(object sender, RoutedEventArgs e)
+        {
+            var materialReportWindow = new MaterialReportWindow();
+            materialReportWindow.Owner = this;
+            materialReportWindow.ShowDialog();
+        }
+
+        private void RevenueReportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для просмотра отчёта по выручке!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var revenueReportWindow = new RevenueReportWindow();
+            revenueReportWindow.Owner = this;
+            revenueReportWindow.ShowDialog();
+        }
+
+        private void ScheduleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var scheduleWindow = new MasterScheduleWindow();
+            scheduleWindow.Owner = this;
+            scheduleWindow.ShowDialog();
+        }
+
+        // ==================== ПРОЧЕЕ ====================
+
         private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
         {
             var changePasswordWindow = new ChangePasswordWindow(currentUser);
@@ -510,12 +581,18 @@ namespace SpaSalon.Views
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            journalRepository.AddEntry(currentUser.Id, currentUser.FullName,
-                "Выход из системы", $"Пользователь {currentUser.FullName} вышел");
+            var result = MessageBox.Show("Вы уверены, что хотите выйти из системы?", "Подтверждение",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            var loginWindow = new LoginWindow();
-            loginWindow.Show();
-            this.Close();
+            if (result == MessageBoxResult.Yes)
+            {
+                journalRepository.AddEntry(currentUser.Id, currentUser.FullName,
+                    "Выход из системы", $"Пользователь {currentUser.FullName} вышел");
+
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
+                this.Close();
+            }
         }
     }
 }

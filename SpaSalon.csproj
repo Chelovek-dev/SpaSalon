@@ -107,10 +107,12 @@
     <Compile Include="ChangePasswordWindow.xaml.cs">
       <DependentUpon>ChangePasswordWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\Supplier.cs" />
     <Compile Include="Repositories\AppointmentRepository.cs" />
     <Compile Include="Repositories\ClientRepository.cs" />
     <Compile Include="Repositories\JournalRepository.cs" />
     <Compile Include="Repositories\MaterialRepository.cs" />
+    <Compile Include="Repositories\SupplierRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Views\AppointmentEditWindow.xaml.cs">
       <DependentUpon>AppointmentEditWindow.xaml</DependentUpon>
@@ -124,14 +126,29 @@
     <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\MasterScheduleWindow.xaml.cs">
+      <DependentUpon>MasterScheduleWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MaterialConsumptionWindow.xaml.cs">
       <DependentUpon>MaterialConsumptionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MaterialReportWindow.xaml.cs">
+      <DependentUpon>MaterialReportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PurchaseWindow.xaml.cs">
+      <DependentUpon>PurchaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ReportWindow.xaml.cs">
       <DependentUpon>ReportWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\RevenueReportWindow.xaml.cs">
+      <DependentUpon>RevenueReportWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ServiceEditWindow.xaml.cs">
       <DependentUpon>ServiceEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SupplierWindow.xaml.cs">
+      <DependentUpon>SupplierWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="ChangePasswordWindow.xaml">
       <SubType>Designer</SubType>
@@ -165,7 +182,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\MasterScheduleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MaterialConsumptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MaterialReportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PurchaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -173,7 +202,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\RevenueReportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ServiceEditWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SupplierWindow.xaml">
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

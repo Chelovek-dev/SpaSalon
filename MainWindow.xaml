@@ -1,134 +1,266 @@
 ﻿<Window x:Class="SpaSalon.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="СПА Салон" 
-        Height="700" 
-        Width="1100"
+        Title="СПА Салон - Система управления" 
+        Height="720" 
+        Width="1650"
+        MinHeight="720" 
+        MinWidth="1650"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
+        <!-- Стиль для кнопок действий -->
         <Style x:Key="ActionButton" TargetType="Button">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="12,0"/>
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="#3498DB"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980B9"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для опасных кнопок (удаление) -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#E74C3C"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#C0392B"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для успешных кнопок (добавление) -->
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#27AE60"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#229954"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для предупреждающих кнопок -->
+        <Style x:Key="WarningButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#E67E22"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D35400"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для фиолетовых кнопок -->
+        <Style x:Key="PurpleButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#8E44AD"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#6C3483"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для информационных кнопок -->
+        <Style x:Key="InfoButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#1ABC9C"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#16A085"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#3498DB"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для PasswordBox -->
+        <Style TargetType="PasswordBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="5,0"/>
+        </Style>
+
+        <!-- Стиль для DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <!-- Стиль для DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="RowHeight" Value="35"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        </Style>
+
+        <!-- Стиль для заголовков DataGrid -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#2C3E50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="65"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Верхняя панель -->
+        <!-- ==================== ВЕРХНЯЯ ПАНЕЛЬ ==================== -->
         <Border Grid.Row="0" Background="#2C3E50">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <TextBlock x:Name="UserInfoText" Foreground="White" Margin="10" FontSize="14"/>
-                <Button x:Name="ReportsButton" Content="Отчёты" Width="80" Height="30" 
-                        Margin="5" Background="#9B59B6" Foreground="White"
-                        Click="ReportsButton_Click"/>
-                <Button x:Name="JournalButton" Content="Журнал" Width="80" Height="30" 
-                        Margin="5" Background="#1ABC9C" Foreground="White"
-                        Click="JournalButton_Click"/>
-                <Button x:Name="ChangePasswordButton" Content="Сменить пароль" Width="120" Height="30" 
-                        Margin="5" Click="ChangePasswordButton_Click" Background="#E67E22" Foreground="White"/>
-                <Button x:Name="LogoutButton" Content="Выход" Width="80" Height="30" 
-                        Margin="10" Click="LogoutButton_Click" Background="#E74C3C" Foreground="White"/>
-            </StackPanel>
+            <Grid>
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                    <TextBlock Text="💆‍♀️" FontSize="28" Margin="0,0,10,0"/>
+                    <TextBlock Text="СПА Салон" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text=" | Система управления" FontSize="14" Foreground="#BDC3C7" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Правая панель с кнопками -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <!-- Информация о пользователе -->
+                    <Border Background="#34495E" CornerRadius="5" Padding="10,5" Margin="10,0">
+                        <TextBlock x:Name="UserInfoText" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <!-- Кнопки отчётов и журнала -->
+                    <Button x:Name="ReportsButton" Content="📊 Отчёты" Width="90" Style="{StaticResource PurpleButton}" Click="ReportsButton_Click"/>
+                    <Button x:Name="JournalButton" Content="📋 Журнал" Width="90" Style="{StaticResource InfoButton}" Click="JournalButton_Click"/>
+
+                    <!-- Кнопки управления -->
+                    <Button x:Name="SuppliersButton" Content="🏪 Поставщики" Width="105" Style="{StaticResource PurpleButton}" Click="SuppliersButton_Click"/>
+                    <Button x:Name="PurchasesButton" Content="📦 Закупки" Width="95" Style="{StaticResource WarningButton}" Click="PurchasesButton_Click"/>
+                    <Button x:Name="MaterialReportButton" Content="📦 Материалы" Width="105" Style="{StaticResource InfoButton}" Click="MaterialReportButton_Click"/>
+                    <Button x:Name="RevenueReportButton" Content="💰 Выручка" Width="95" Style="{StaticResource WarningButton}" Click="RevenueReportButton_Click"/>
+                    <Button x:Name="ScheduleButton" Content="📅 График" Width="90" Style="{StaticResource InfoButton}" Click="ScheduleButton_Click"/>
+
+                    <!-- Кнопка смены пароля -->
+                    <Button x:Name="ChangePasswordButton" Content="🔑 Сменить пароль" Width="130" Style="{StaticResource WarningButton}" Click="ChangePasswordButton_Click"/>
+
+                    <!-- Кнопка выхода -->
+                    <Button x:Name="LogoutButton" Content="🚪 Выход" Width="85" Style="{StaticResource DangerButton}" Margin="10,5,15,5" Click="LogoutButton_Click"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Основное содержимое -->
-        <TabControl Grid.Row="1">
-            <!-- Вкладка Клиенты -->
-            <TabItem Header="Клиенты">
-                <Grid Margin="10">
+        <!-- ==================== ОСНОВНОЕ СОДЕРЖИМОЕ ==================== -->
+        <TabControl Grid.Row="1" x:Name="MainTabControl" Background="#ECF0F1">
+
+            <!-- ========== ВКЛАДКА КЛИЕНТЫ ========== -->
+            <TabItem Header="👥 Клиенты" Background="#ECF0F1">
+                <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="#F0F0F0" Padding="10" Margin="0,0,0,10">
+                    <!-- Панель поиска -->
+                    <Border Grid.Row="0" Background="White" Padding="12" Margin="0,0,0,12" CornerRadius="8" BorderBrush="#DDD" BorderThickness="1">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="SearchTextBox" Grid.Column="0" Height="30" 
-                                     FontSize="14" ToolTip="Поиск по ФИО или телефону"/>
-                            <Button x:Name="SearchButton" Grid.Column="1" Content="Поиск" 
-                                    Width="80" Height="30" Margin="10,0,0,0"
+                            <TextBox x:Name="SearchTextBox" Grid.Column="0" Height="38" FontSize="14" 
+                                     ToolTip="Поиск по ФИО или телефону"/>
+                            <Button x:Name="SearchButton" Grid.Column="1" Content="🔍 Поиск" 
+                                    Width="100" Height="38" Margin="12,0,0,0"
                                     Style="{StaticResource ActionButton}" Click="SearchButton_Click"/>
                         </Grid>
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="AddClientButton" Content="Добавить клиента" 
-                                Width="150" Style="{StaticResource ActionButton}"
-                                Click="AddClientButton_Click"/>
-                        <Button x:Name="EditClientButton" Content="Редактировать" 
-                                Width="120" Style="{StaticResource ActionButton}"
-                                Click="EditClientButton_Click"/>
-                        <Button x:Name="DeleteClientButton" Content="Удалить" 
-                                Width="100" Style="{StaticResource ActionButton}"
-                                Click="DeleteClientButton_Click"/>
-                        <Button x:Name="RefreshClientsButton" Content="Обновить" 
-                                Width="100" Style="{StaticResource ActionButton}"
-                                Click="RefreshClientsButton_Click"/>
+                    <!-- Кнопки действий -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button x:Name="AddClientButton" Content="➕ Добавить клиента" Width="160" Style="{StaticResource SuccessButton}" Click="AddClientButton_Click"/>
+                        <Button x:Name="EditClientButton" Content="✏️ Редактировать" Width="130" Style="{StaticResource ActionButton}" Click="EditClientButton_Click"/>
+                        <Button x:Name="DeleteClientButton" Content="🗑️ Удалить" Width="110" Style="{StaticResource DangerButton}" Click="DeleteClientButton_Click"/>
+                        <Button x:Name="RefreshClientsButton" Content="🔄 Обновить" Width="110" Style="{StaticResource ActionButton}" Click="RefreshClientsButton_Click"/>
                     </StackPanel>
 
+                    <!-- Таблица клиентов -->
                     <DataGrid x:Name="ClientsDataGrid" Grid.Row="2" 
                               AutoGenerateColumns="False" IsReadOnly="True"
                               SelectionMode="Single" SelectionUnit="FullRow">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="200"/>
-                            <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
-                            <DataGridTextColumn Header="Дата рождения" Binding="{Binding BirthDateString}" Width="120"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="250"/>
+                            <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="160"/>
+                            <DataGridTextColumn Header="Дата рождения" Binding="{Binding BirthDateString}" Width="130"/>
                             <DataGridTextColumn Header="Возраст" Binding="{Binding Age}" Width="80"/>
-                            <DataGridTextColumn Header="Дата регистрации" Binding="{Binding RegistrationDateString}" Width="120"/>
+                            <DataGridTextColumn Header="Дата регистрации" Binding="{Binding RegistrationDateString}" Width="130"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- Вкладка Услуги -->
-            <TabItem Header="Услуги">
-                <Grid Margin="10">
+            <!-- ========== ВКЛАДКА УСЛУГИ ========== -->
+            <TabItem Header="💇 Услуги" Background="#ECF0F1">
+                <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="AddServiceButton" Content="Добавить услугу" 
-                                Width="150" Style="{StaticResource ActionButton}"
-                                Click="AddServiceButton_Click"/>
-                        <Button x:Name="RefreshServicesButton" Content="Обновить" 
-                                Width="100" Style="{StaticResource ActionButton}"
-                                Click="RefreshServicesButton_Click"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button x:Name="AddServiceButton" Content="➕ Добавить услугу" Width="160" Style="{StaticResource SuccessButton}" Click="AddServiceButton_Click"/>
+                        <Button x:Name="RefreshServicesButton" Content="🔄 Обновить" Width="110" Style="{StaticResource ActionButton}" Click="RefreshServicesButton_Click"/>
                     </StackPanel>
 
                     <DataGrid x:Name="ServicesDataGrid" Grid.Row="1" 
                               AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="250"/>
-                            <DataGridTextColumn Header="Стоимость" Binding="{Binding CostString}" Width="120"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="Наименование услуги" Binding="{Binding Name}" Width="350"/>
+                            <DataGridTextColumn Header="Стоимость" Binding="{Binding CostString}" Width="130"/>
                             <DataGridTextColumn Header="Длительность" Binding="{Binding DurationString}" Width="150"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- Вкладка Записи -->
-            <TabItem Header="Записи">
-                <Grid Margin="10">
+            <!-- ========== ВКЛАДКА ЗАПИСИ ========== -->
+            <TabItem Header="📅 Записи" Background="#ECF0F1">
+                <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -136,51 +268,39 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="#F0F0F0" Padding="10" Margin="0,0,0,10">
+                    <!-- Панель фильтра -->
+                    <Border Grid.Row="0" Background="White" Padding="12" Margin="0,0,0,12" CornerRadius="8" BorderBrush="#DDD" BorderThickness="1">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Дата:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <DatePicker x:Name="FilterDatePicker" Width="120" Height="30"/>
-                            <Button x:Name="ShowAllAppointmentsButton" Content="Все записи" 
-                                    Width="100" Height="30" Margin="20,0,0,0"
-                                    Style="{StaticResource ActionButton}"
-                                    Click="ShowAllAppointmentsButton_Click"/>
+                            <TextBlock Text="📅 Фильтр по дате:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold"/>
+                            <DatePicker x:Name="FilterDatePicker" Width="140" Height="35"/>
+                            <Button x:Name="ShowAllAppointmentsButton" Content="📋 Все записи" Width="120" Height="35" Margin="20,0,0,0"
+                                    Style="{StaticResource ActionButton}" Click="ShowAllAppointmentsButton_Click"/>
                         </StackPanel>
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="AddAppointmentButton" Content="Добавить запись" 
-                                Width="150" Style="{StaticResource ActionButton}"
-                                Click="AddAppointmentButton_Click"/>
-                        <Button x:Name="EditAppointmentButton" Content="Редактировать" 
-                                Width="120" Style="{StaticResource ActionButton}"
-                                Click="EditAppointmentButton_Click"/>
-                        <Button x:Name="CancelAppointmentButton" Content="Отменить запись" 
-                                Width="130" Style="{StaticResource ActionButton}"
-                                Click="CancelAppointmentButton_Click" Background="#E67E22"/>
-                        <Button x:Name="ConfirmAppointmentButton" Content="Подтвердить" 
-                                Width="120" Style="{StaticResource ActionButton}"
-                                Click="ConfirmAppointmentButton_Click" Background="#27AE60"/>
-                        <Button x:Name="CompleteAppointmentButton" Content="Выполнена" 
-                                Width="120" Style="{StaticResource ActionButton}"
-                                Click="CompleteAppointmentButton_Click" Background="#2196F3"/>
-                        <Button x:Name="RefreshAppointmentsButton" Content="Обновить" 
-                                Width="100" Style="{StaticResource ActionButton}"
-                                Click="RefreshAppointmentsButton_Click"/>
+                    <!-- Кнопки действий -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button x:Name="AddAppointmentButton" Content="➕ Добавить запись" Width="150" Style="{StaticResource SuccessButton}" Click="AddAppointmentButton_Click"/>
+                        <Button x:Name="EditAppointmentButton" Content="✏️ Редактировать" Width="130" Style="{StaticResource ActionButton}" Click="EditAppointmentButton_Click"/>
+                        <Button x:Name="CancelAppointmentButton" Content="❌ Отменить запись" Width="140" Style="{StaticResource WarningButton}" Click="CancelAppointmentButton_Click"/>
+                        <Button x:Name="ConfirmAppointmentButton" Content="✅ Подтвердить" Width="120" Style="{StaticResource SuccessButton}" Click="ConfirmAppointmentButton_Click"/>
+                        <Button x:Name="CompleteAppointmentButton" Content="✔️ Выполнена" Width="120" Style="{StaticResource ActionButton}" Click="CompleteAppointmentButton_Click"/>
+                        <Button x:Name="RefreshAppointmentsButton" Content="🔄 Обновить" Width="100" Style="{StaticResource ActionButton}" Click="RefreshAppointmentsButton_Click"/>
                     </StackPanel>
 
+                    <!-- Таблица записей -->
                     <DataGrid x:Name="AppointmentsDataGrid" Grid.Row="2" 
                               AutoGenerateColumns="False" IsReadOnly="True"
-                              SelectionMode="Single" SelectionUnit="FullRow"
-                              Margin="0,10,0,0">
+                              SelectionMode="Single" SelectionUnit="FullRow">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Дата" Binding="{Binding DateOnlyString}" Width="100"/>
                             <DataGridTextColumn Header="Время" Binding="{Binding TimeOnlyString}" Width="80"/>
-                            <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="180"/>
+                            <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="200"/>
                             <DataGridTextColumn Header="Телефон" Binding="{Binding ClientPhone}" Width="130"/>
-                            <DataGridTextColumn Header="Услуга" Binding="{Binding ServiceName}" Width="200"/>
+                            <DataGridTextColumn Header="Услуга" Binding="{Binding ServiceName}" Width="220"/>
                             <DataGridTextColumn Header="Мастер" Binding="{Binding MasterName}" Width="150"/>
-                            <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="120"/>
+                            <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="110"/>
                             <DataGridTextColumn Header="Стоимость" Binding="{Binding CostString}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
