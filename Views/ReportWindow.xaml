@@ -1,0 +1,77 @@
+﻿<Window x:Class="SpaSalon.Views.ReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Отчёты СПА Салона" 
+        Height="600" 
+        Width="900"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Панель фильтров -->
+        <Border Grid.Row="0" Background="#F0F0F0" Padding="10" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock Text="Период отчёта" FontWeight="Bold" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <DatePicker x:Name="StartDatePicker" Width="150" Height="30"/>
+                    <TextBlock Text=" — " VerticalAlignment="Center" Margin="10,0"/>
+                    <DatePicker x:Name="EndDatePicker" Width="150" Height="30"/>
+                    <Button x:Name="GenerateReportButton" Content="Сформировать" Width="120" Height="30" 
+                            Margin="20,0,0,0" Background="#3498DB" Foreground="White"
+                            Click="GenerateReportButton_Click"/>
+                    <Button x:Name="ExportButton" Content="Экспорт в Excel" Width="120" Height="30" 
+                            Margin="10,0,0,0" Background="#27AE60" Foreground="White"
+                            Click="ExportButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Таблица с отчётом -->
+        <DataGrid x:Name="ReportDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Дата" Binding="{Binding DateOnlyString}" Width="100"/>
+                <DataGridTextColumn Header="Время" Binding="{Binding TimeOnlyString}" Width="80"/>
+                <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="150"/>
+                <DataGridTextColumn Header="Телефон" Binding="{Binding ClientPhone}" Width="120"/>
+                <DataGridTextColumn Header="Услуга" Binding="{Binding ServiceName}" Width="180"/>
+                <DataGridTextColumn Header="Мастер" Binding="{Binding MasterName}" Width="120"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="100"/>
+                <DataGridTextColumn Header="Стоимость" Binding="{Binding CostString}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Панель итогов -->
+        <Border Grid.Row="2" Background="#E8F4FD" Padding="10" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                    <TextBlock Text="Всего записей" FontSize="12" Foreground="#666"/>
+                    <TextBlock x:Name="TotalCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#2C3E50"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                    <TextBlock Text="Выполнено" FontSize="12" Foreground="#666"/>
+                    <TextBlock x:Name="CompletedCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#27AE60"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                    <TextBlock Text="Отменено" FontSize="12" Foreground="#666"/>
+                    <TextBlock x:Name="CancelledCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#E74C3C"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" HorizontalAlignment="Center">
+                    <TextBlock Text="Общая выручка" FontSize="12" Foreground="#666"/>
+                    <TextBlock x:Name="TotalRevenueText" Text="0 ₽" FontSize="24" FontWeight="Bold" Foreground="#3498DB"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
