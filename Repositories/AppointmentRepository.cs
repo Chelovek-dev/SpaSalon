@@ -16,23 +16,23 @@ namespace SpaSalon.Repositories
             var appointments = new List<Appointment>();
             string query = @"
                 SELECT 
-                    a.`код записи` as Id,
-                    a.`код клиента` as ClientId,
+                    z.`код записи` as Id,
+                    z.`код клиента` as ClientId,
                     c.`фио` as ClientName,
                     c.`телефон` as ClientPhone,
-                    a.`код услуги` as ServiceId,
+                    z.`код услуги` as ServiceId,
                     u.`наименование услуги` as ServiceName,
                     u.`стоимость` as ServiceCost,
                     u.`длительность` as ServiceDuration,
-                    a.`код мастера` as MasterId,
+                    z.`код мастера` as MasterId,
                     m.`фио` as MasterName,
-                    a.`дата и время` as DateTime,
-                    a.`статус записи` as Status
-                FROM `администратор` a
-                JOIN `клиенты` c ON a.`код клиента` = c.`код клиента`
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                JOIN `мастера` m ON a.`код мастера` = m.`код мастера`
-                ORDER BY a.`дата и время` DESC";
+                    z.`дата и время` as DateTime,
+                    z.`статус записи` as Status
+                FROM `записи` z
+                JOIN `клиенты` c ON z.`код клиента` = c.`код клиента`
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                JOIN `мастера` m ON z.`код мастера` = m.`код мастера`
+                ORDER BY z.`дата и время` DESC";
 
             DataTable result = db.ExecuteQuery(query);
 
@@ -63,24 +63,24 @@ namespace SpaSalon.Repositories
             var appointments = new List<Appointment>();
             string query = @"
                 SELECT 
-                    a.`код записи` as Id,
-                    a.`код клиента` as ClientId,
+                    z.`код записи` as Id,
+                    z.`код клиента` as ClientId,
                     c.`фио` as ClientName,
                     c.`телефон` as ClientPhone,
-                    a.`код услуги` as ServiceId,
+                    z.`код услуги` as ServiceId,
                     u.`наименование услуги` as ServiceName,
                     u.`стоимость` as ServiceCost,
                     u.`длительность` as ServiceDuration,
-                    a.`код мастера` as MasterId,
+                    z.`код мастера` as MasterId,
                     m.`фио` as MasterName,
-                    a.`дата и время` as DateTime,
-                    a.`статус записи` as Status
-                FROM `администратор` a
-                JOIN `клиенты` c ON a.`код клиента` = c.`код клиента`
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                JOIN `мастера` m ON a.`код мастера` = m.`код мастера`
-                WHERE a.`код мастера` = @masterId
-                ORDER BY a.`дата и время` DESC";
+                    z.`дата и время` as DateTime,
+                    z.`статус записи` as Status
+                FROM `записи` z
+                JOIN `клиенты` c ON z.`код клиента` = c.`код клиента`
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                JOIN `мастера` m ON z.`код мастера` = m.`код мастера`
+                WHERE z.`код мастера` = @masterId
+                ORDER BY z.`дата и время` DESC";
 
             var parameters = new MySqlParameter[]
             {
@@ -116,24 +116,24 @@ namespace SpaSalon.Repositories
             var appointments = new List<Appointment>();
             string query = @"
                 SELECT 
-                    a.`код записи` as Id,
-                    a.`код клиента` as ClientId,
+                    z.`код записи` as Id,
+                    z.`код клиента` as ClientId,
                     c.`фио` as ClientName,
                     c.`телефон` as ClientPhone,
-                    a.`код услуги` as ServiceId,
+                    z.`код услуги` as ServiceId,
                     u.`наименование услуги` as ServiceName,
                     u.`стоимость` as ServiceCost,
                     u.`длительность` as ServiceDuration,
-                    a.`код мастера` as MasterId,
+                    z.`код мастера` as MasterId,
                     m.`фио` as MasterName,
-                    a.`дата и время` as DateTime,
-                    a.`статус записи` as Status
-                FROM `администратор` a
-                JOIN `клиенты` c ON a.`код клиента` = c.`код клиента`
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                JOIN `мастера` m ON a.`код мастера` = m.`код мастера`
-                WHERE DATE(a.`дата и время`) = @date
-                ORDER BY a.`дата и время`";
+                    z.`дата и время` as DateTime,
+                    z.`статус записи` as Status
+                FROM `записи` z
+                JOIN `клиенты` c ON z.`код клиента` = c.`код клиента`
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                JOIN `мастера` m ON z.`код мастера` = m.`код мастера`
+                WHERE DATE(z.`дата и время`) = @date
+                ORDER BY z.`дата и время`";
 
             var parameters = new MySqlParameter[]
             {
@@ -169,24 +169,24 @@ namespace SpaSalon.Repositories
             var appointments = new List<Appointment>();
             string query = @"
                 SELECT 
-                    a.`код записи` as Id,
-                    a.`код клиента` as ClientId,
+                    z.`код записи` as Id,
+                    z.`код клиента` as ClientId,
                     c.`фио` as ClientName,
                     c.`телефон` as ClientPhone,
-                    a.`код услуги` as ServiceId,
+                    z.`код услуги` as ServiceId,
                     u.`наименование услуги` as ServiceName,
                     u.`стоимость` as ServiceCost,
                     u.`длительность` as ServiceDuration,
-                    a.`код мастера` as MasterId,
+                    z.`код мастера` as MasterId,
                     m.`фио` as MasterName,
-                    a.`дата и время` as DateTime,
-                    a.`статус записи` as Status
-                FROM `администратор` a
-                JOIN `клиенты` c ON a.`код клиента` = c.`код клиента`
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                JOIN `мастера` m ON a.`код мастера` = m.`код мастера`
-                WHERE DATE(a.`дата и время`) BETWEEN @startDate AND @endDate
-                ORDER BY a.`дата и время`";
+                    z.`дата и время` as DateTime,
+                    z.`статус записи` as Status
+                FROM `записи` z
+                JOIN `клиенты` c ON z.`код клиента` = c.`код клиента`
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                JOIN `мастера` m ON z.`код мастера` = m.`код мастера`
+                WHERE DATE(z.`дата и время`) BETWEEN @startDate AND @endDate
+                ORDER BY z.`дата и время`";
 
             var parameters = new MySqlParameter[]
             {
@@ -218,26 +218,25 @@ namespace SpaSalon.Repositories
             return appointments;
         }
 
-        // ПРОВЕРКА ЗАНЯТОСТИ МАСТЕРА
         public bool CheckMasterAvailability(int masterId, DateTime dateTime, int durationMinutes, int? excludeAppointmentId = null)
         {
             DateTime startTime = dateTime;
             DateTime endTime = dateTime.AddMinutes(durationMinutes);
 
             string query = @"
-                SELECT COUNT(*) FROM `администратор` a
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                WHERE a.`код мастера` = @masterId 
-                AND a.`статус записи` NOT IN ('cancelled', 'completed')
+                SELECT COUNT(*) FROM `записи` z
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                WHERE z.`код мастера` = @masterId 
+                AND z.`статус записи` NOT IN ('отменена', 'выполнена')
                 AND (
-                    (a.`дата и время` BETWEEN @startTime AND @endTime)
-                    OR (DATE_ADD(a.`дата и время`, INTERVAL u.`длительность` MINUTE) BETWEEN @startTime AND @endTime)
-                    OR (a.`дата и время` <= @startTime AND DATE_ADD(a.`дата и время`, INTERVAL u.`длительность` MINUTE) >= @endTime)
+                    (z.`дата и время` BETWEEN @startTime AND @endTime)
+                    OR (DATE_ADD(z.`дата и время`, INTERVAL u.`длительность` MINUTE) BETWEEN @startTime AND @endTime)
+                    OR (z.`дата и время` <= @startTime AND DATE_ADD(z.`дата и время`, INTERVAL u.`длительность` MINUTE) >= @endTime)
                 )";
 
             if (excludeAppointmentId.HasValue)
             {
-                query += " AND a.`код записи` != @excludeId";
+                query += " AND z.`код записи` != @excludeId";
             }
 
             var parameters = new List<MySqlParameter>
@@ -261,12 +260,12 @@ namespace SpaSalon.Repositories
         {
             var busySlots = new List<DateTime>();
             string query = @"
-                SELECT a.`дата и время`, u.`длительность`
-                FROM `администратор` a
-                JOIN `услуги` u ON a.`код услуги` = u.`код услуги`
-                WHERE a.`код мастера` = @masterId 
-                AND DATE(a.`дата и время`) = @date
-                AND a.`статус записи` NOT IN ('cancelled', 'completed')";
+                SELECT z.`дата и время`, u.`длительность`
+                FROM `записи` z
+                JOIN `услуги` u ON z.`код услуги` = u.`код услуги`
+                WHERE z.`код мастера` = @masterId 
+                AND DATE(z.`дата и время`) = @date
+                AND z.`статус записи` NOT IN ('отменена', 'выполнена')";
 
             var parameters = new MySqlParameter[]
             {
@@ -286,7 +285,7 @@ namespace SpaSalon.Repositories
         public bool AddAppointment(Appointment appointment)
         {
             string query = @"
-                INSERT INTO `администратор` 
+                INSERT INTO `записи` 
                 (`код клиента`, `код услуги`, `код мастера`, `дата и время`, `статус записи`) 
                 VALUES (@clientId, @serviceId, @masterId, @dateTime, @status)";
 
@@ -296,7 +295,7 @@ namespace SpaSalon.Repositories
                 new MySqlParameter("@serviceId", appointment.ServiceId),
                 new MySqlParameter("@masterId", appointment.MasterId),
                 new MySqlParameter("@dateTime", appointment.DateTime),
-                new MySqlParameter("@status", "new")
+                new MySqlParameter("@status", "новая")
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
@@ -305,7 +304,7 @@ namespace SpaSalon.Repositories
         public bool UpdateAppointment(Appointment appointment)
         {
             string query = @"
-                UPDATE `администратор` 
+                UPDATE `записи` 
                 SET `код клиента` = @clientId, 
                     `код услуги` = @serviceId, 
                     `код мастера` = @masterId, 
@@ -328,7 +327,7 @@ namespace SpaSalon.Repositories
 
         public bool CancelAppointment(int appointmentId, string reason)
         {
-            string query = "UPDATE `администратор` SET `статус записи` = 'cancelled' WHERE `код записи` = @id";
+            string query = "UPDATE `записи` SET `статус записи` = 'отменена' WHERE `код записи` = @id";
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@id", appointmentId)
@@ -338,7 +337,7 @@ namespace SpaSalon.Repositories
 
         public bool ConfirmAppointment(int appointmentId)
         {
-            string query = "UPDATE `администратор` SET `статус записи` = 'confirmed' WHERE `код записи` = @id";
+            string query = "UPDATE `записи` SET `статус записи` = 'подтверждена' WHERE `код записи` = @id";
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@id", appointmentId)
@@ -348,7 +347,7 @@ namespace SpaSalon.Repositories
 
         public bool CompleteAppointment(int appointmentId, decimal actualCost)
         {
-            string query = "UPDATE `администратор` SET `статус записи` = 'completed' WHERE `код записи` = @id";
+            string query = "UPDATE `записи` SET `статус записи` = 'выполнена' WHERE `код записи` = @id";
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@id", appointmentId)
@@ -358,7 +357,7 @@ namespace SpaSalon.Repositories
 
         public bool DeleteAppointment(int id)
         {
-            string query = "DELETE FROM `администратор` WHERE `код записи` = @id";
+            string query = "DELETE FROM `записи` WHERE `код записи` = @id";
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@id", id)

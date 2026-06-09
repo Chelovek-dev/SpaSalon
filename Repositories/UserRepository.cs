@@ -56,7 +56,6 @@ namespace SpaSalon.Repositories
             if (string.IsNullOrEmpty(position)) return "Master";
 
             position = position.ToLower();
-            // Только Администратор или Мастер
             if (position.Contains("администратор") || position.Contains("admin") || position.Contains("старший"))
                 return "Admin";
             return "Master";
@@ -66,7 +65,8 @@ namespace SpaSalon.Repositories
         {
             try
             {
-                string query = "UPDATE `мастера` SET `пароль` = @password WHERE `код мастера` = @userId";
+                // Используем MD5 хэширование
+                string query = "UPDATE `мастера` SET `пароль` = MD5(@password) WHERE `код мастера` = @userId";
                 var parameters = new MySqlParameter[]
                 {
                     new MySqlParameter("@password", newPassword),

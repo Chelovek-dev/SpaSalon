@@ -11,11 +11,11 @@ namespace SpaSalon.Models
         public int ServiceId { get; set; }
         public string ServiceName { get; set; }
         public decimal ServiceCost { get; set; }
-        public int ServiceDuration { get; set; } // длительность услуги в минутах
+        public int ServiceDuration { get; set; }
         public int MasterId { get; set; }
         public string MasterName { get; set; }
         public DateTime DateTime { get; set; }
-        public string Status { get; set; } // new, confirmed, completed, cancelled
+        public string Status { get; set; }
         public string CancellationReason { get; set; }
         public DateTime? CompletionDate { get; set; }
         public decimal ActualCost { get; set; }
@@ -26,10 +26,10 @@ namespace SpaSalon.Models
             {
                 switch (Status)
                 {
-                    case "new": return "Новая";
-                    case "confirmed": return "Подтверждена";
-                    case "completed": return "Выполнена";
-                    case "cancelled": return "Отменена";
+                    case "новая": return "Новая";
+                    case "подтверждена": return "Подтверждена";
+                    case "выполнена": return "Выполнена";
+                    case "отменена": return "Отменена";
                     default: return Status;
                 }
             }
@@ -41,10 +41,10 @@ namespace SpaSalon.Models
             {
                 switch (Status)
                 {
-                    case "new": return "#FF9800";
-                    case "confirmed": return "#4CAF50";
-                    case "completed": return "#2196F3";
-                    case "cancelled": return "#F44336";
+                    case "новая": return "#FF9800";
+                    case "подтверждена": return "#4CAF50";
+                    case "выполнена": return "#2196F3";
+                    case "отменена": return "#F44336";
                     default: return "#999999";
                 }
             }
