@@ -22,6 +22,7 @@ namespace SpaSalon.Views
             LoadMasters();
             CurrentDatePicker.SelectedDate = DateTime.Today;
             currentWeekStart = GetWeekStart(DateTime.Today);
+            UpdateDayHeaders();
             LoadSchedule();
         }
 
@@ -40,6 +41,17 @@ namespace SpaSalon.Views
             return date.AddDays(-diff).Date;
         }
 
+        private void UpdateDayHeaders()
+        {
+            Day0Header.Text = $"{currentWeekStart:dd.MM}\nПН";
+            Day1Header.Text = $"{currentWeekStart.AddDays(1):dd.MM}\nВТ";
+            Day2Header.Text = $"{currentWeekStart.AddDays(2):dd.MM}\nСР";
+            Day3Header.Text = $"{currentWeekStart.AddDays(3):dd.MM}\nЧТ";
+            Day4Header.Text = $"{currentWeekStart.AddDays(4):dd.MM}\nПТ";
+            Day5Header.Text = $"{currentWeekStart.AddDays(5):dd.MM}\nСБ";
+            Day6Header.Text = $"{currentWeekStart.AddDays(6):dd.MM}\nВС";
+        }
+
         private void LoadSchedule()
         {
             DateTime endDate = currentWeekStart.AddDays(7);
@@ -56,78 +68,65 @@ namespace SpaSalon.Views
                 appointments = allAppointments.Where(a => a.MasterId == selectedMasterId).ToList();
             }
 
-            // Создаём слоты времени с 9:00 до 21:00 с шагом 30 минут
+            // Создаём слоты времени с 9:00 до 21:00 с шагом 60 минут (для простоты)
             timeSlots = new List<TimeSlotViewModel>();
 
             for (int hour = 9; hour <= 20; hour++)
             {
-                for (int minute = 0; minute < 60; minute += 30)
+                var timeSlot = new TimeSlotViewModel
                 {
-                    if (hour == 20 && minute > 0) continue;
+                    TimeSlot = $"{hour:D2}:00 - {hour + 1:D2}:00"
+                };
 
-                    var timeSlot = new TimeSlotViewModel
+                // Для каждого дня недели
+                for (int day = 0; day < 7; day++)
+                {
+                    DateTime slotDateTime = currentWeekStart.AddDays(day).AddHours(hour);
+                    var appointment = appointments.FirstOrDefault(a =>
+                        a.DateTime.Date == slotDateTime.Date &&
+                        a.DateTime.Hour >= hour &&
+                        a.DateTime.Hour < hour + 1);
+
+                    string color = "#E0E0E0";
+                    string text = "Свободно";
+
+                    if (appointment != null)
                     {
-                        TimeSlot = $"{hour:D2}:{minute:D2}",
-                        Appointments = new List<AppointmentDisplay>()
-                    };
-
-                    // Для каждого дня недели
-                    for (int i = 0; i < 7; i++)
-                    {
-                        DateTime slotDateTime = currentWeekStart.AddDays(i).AddHours(hour).AddMinutes(minute);
-                        var appointment = appointments.FirstOrDefault(a =>
-                            a.DateTime.Date == slotDateTime.Date &&
-                            a.DateTime.Hour == hour &&
-                            a.DateTime.Minute >= minute &&
-                            a.DateTime.Minute < minute + 30);
-
-                        if (appointment != null)
+                        switch (appointment.Status)
                         {
-                            timeSlot.Appointments.Add(new AppointmentDisplay
-                            {
-                                MasterName = appointment.MasterName,
-                                ClientName = appointment.ClientName,
-                                ServiceName = appointment.ServiceName,
-                                Status = appointment.Status,
-                                Color = GetStatusColor(appointment.Status),
-                                DisplayText = $"{appointment.MasterName}: {appointment.ClientName}",
-                                Tooltip = $"{appointment.TimeOnlyString} | {appointment.ClientName} | {appointment.ServiceName} | {appointment.StatusDisplay}"
-                            });
-                        }
-                        else if (i == 0) // Показываем свободное время только для понедельника для наглядности
-                        {
-                            timeSlot.Appointments.Add(new AppointmentDisplay
-                            {
-                                MasterName = "Свободно",
-                                DisplayText = "Свободно",
-                                Color = "#E0E0E0"
-                            });
+                            case "новая":
+                                color = "#FF9800";
+                                text = $"{appointment.ClientName}\n{appointment.ServiceName}";
+                                break;
+                            case "подтверждена":
+                                color = "#4CAF50";
+                                text = $"{appointment.ClientName}\n{appointment.ServiceName}";
+                                break;
+                            case "выполнена":
+                                color = "#2196F3";
+                                text = $"{appointment.ClientName}\n{appointment.ServiceName}";
+                                break;
+                            case "отменена":
+                                color = "#F44336";
+                                text = "ОТМЕНЕНА";
+                                break;
                         }
                     }
 
-                    timeSlots.Add(timeSlot);
+                    timeSlot.SetDayData(day, color, text);
                 }
+
+                timeSlots.Add(timeSlot);
             }
 
             ScheduleItemsControl.ItemsSource = timeSlots;
-        }
-
-        private string GetStatusColor(string status)
-        {
-            switch (status)
-            {
-                case "new": return "#FF9800";
-                case "confirmed": return "#4CAF50";
-                case "completed": return "#2196F3";
-                case "cancelled": return "#F44336";
-                default: return "#E0E0E0";
-            }
         }
 
         private void PrevWeekButton_Click(object sender, RoutedEventArgs e)
         {
             currentWeekStart = currentWeekStart.AddDays(-7);
             CurrentDatePicker.SelectedDate = currentWeekStart.AddDays(3);
+            UpdateDayHeaders();
             LoadSchedule();
         }
 
@@ -135,6 +134,7 @@ namespace SpaSalon.Views
         {
             currentWeekStart = currentWeekStart.AddDays(7);
             CurrentDatePicker.SelectedDate = currentWeekStart.AddDays(3);
+            UpdateDayHeaders();
             LoadSchedule();
         }
 
@@ -142,6 +142,7 @@ namespace SpaSalon.Views
         {
             currentWeekStart = GetWeekStart(DateTime.Today);
             CurrentDatePicker.SelectedDate = DateTime.Today;
+            UpdateDayHeaders();
             LoadSchedule();
         }
 
@@ -150,6 +151,7 @@ namespace SpaSalon.Views
             if (CurrentDatePicker.SelectedDate.HasValue)
             {
                 currentWeekStart = GetWeekStart(CurrentDatePicker.SelectedDate.Value);
+                UpdateDayHeaders();
                 LoadSchedule();
             }
         }
@@ -160,20 +162,61 @@ namespace SpaSalon.Views
         }
     }
 
-    public class TimeSlotViewModel
+    public class TimeSlotViewModel : DependencyObject
     {
         public string TimeSlot { get; set; }
-        public List<AppointmentDisplay> Appointments { get; set; }
-    }
 
-    public class AppointmentDisplay
-    {
-        public string MasterName { get; set; }
-        public string ClientName { get; set; }
-        public string ServiceName { get; set; }
-        public string Status { get; set; }
-        public string Color { get; set; }
-        public string DisplayText { get; set; }
-        public string Tooltip { get; set; }
+        public string Day0Text { get; set; } = "Свободно";
+        public string Day1Text { get; set; } = "Свободно";
+        public string Day2Text { get; set; } = "Свободно";
+        public string Day3Text { get; set; } = "Свободно";
+        public string Day4Text { get; set; } = "Свободно";
+        public string Day5Text { get; set; } = "Свободно";
+        public string Day6Text { get; set; } = "Свободно";
+
+        public Brush Day0Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day1Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day2Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day3Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day4Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day5Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+        public Brush Day6Color { get; set; } = new SolidColorBrush(Color.FromRgb(224, 224, 224));
+
+        public void SetDayData(int day, string colorHex, string text)
+        {
+            var color = (SolidColorBrush)new BrushConverter().ConvertFromString(colorHex);
+
+            switch (day)
+            {
+                case 0:
+                    Day0Text = text;
+                    Day0Color = color;
+                    break;
+                case 1:
+                    Day1Text = text;
+                    Day1Color = color;
+                    break;
+                case 2:
+                    Day2Text = text;
+                    Day2Color = color;
+                    break;
+                case 3:
+                    Day3Text = text;
+                    Day3Color = color;
+                    break;
+                case 4:
+                    Day4Text = text;
+                    Day4Color = color;
+                    break;
+                case 5:
+                    Day5Text = text;
+                    Day5Color = color;
+                    break;
+                case 6:
+                    Day6Text = text;
+                    Day6Color = color;
+                    break;
+            }
+        }
     }
 }

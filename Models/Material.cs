@@ -42,8 +42,9 @@ namespace SpaSalon.Models
         public string MaterialName { get; set; }
         public int QuantityUsed { get; set; }
         public DateTime ConsumptionDate { get; set; }
+        public string Unit { get; set; }  // <--- ДОБАВЛЕНО ЭТО СВОЙСТВО
 
-        public string QuantityDisplay => $"{QuantityUsed} шт.";
+        public string QuantityDisplay => $"{QuantityUsed} {Unit ?? "шт"}";
         public string DateString => ConsumptionDate.ToString("dd.MM.yyyy HH:mm");
     }
 

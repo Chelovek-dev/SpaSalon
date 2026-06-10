@@ -28,7 +28,7 @@ namespace SpaSalon.Views
             LoadClients();
             LoadServices();
             LoadAppointments(null);
-            ShowClientsPanel(); // Показываем клиентов по умолчанию
+            ShowClientsPanel();
 
             // Записываем в журнал
             journalRepository.AddEntry(user.Id, user.FullName, "Вход в систему",
@@ -42,45 +42,73 @@ namespace SpaSalon.Views
         {
             if (currentUser.Role == "Admin")
             {
-                // Администратор - полный доступ ко всему
+                // ========== АДМИНИСТРАТОР - ПОЛНЫЙ ДОСТУП ==========
+                // Вкладка Клиенты
                 AddClientButton.Visibility = Visibility.Visible;
                 EditClientButton.Visibility = Visibility.Visible;
                 DeleteClientButton.Visibility = Visibility.Visible;
                 RefreshClientsButton.Visibility = Visibility.Visible;
+
+                // Вкладка Услуги
                 AddServiceButton.Visibility = Visibility.Visible;
                 RefreshServicesButton.Visibility = Visibility.Visible;
+
+                // Вкладка Записи
                 AddAppointmentButton.Visibility = Visibility.Visible;
                 EditAppointmentButton.Visibility = Visibility.Visible;
                 CancelAppointmentButton.Visibility = Visibility.Visible;
                 ConfirmAppointmentButton.Visibility = Visibility.Visible;
                 CompleteAppointmentButton.Visibility = Visibility.Visible;
                 RefreshAppointmentsButton.Visibility = Visibility.Visible;
+
+                // Отчёты (левая панель)
+                ReportsButton.Visibility = Visibility.Visible;
+                RevenueReportButton.Visibility = Visibility.Visible;
+                MaterialReportButton.Visibility = Visibility.Visible;
+                ScheduleButton.Visibility = Visibility.Visible;
+                JournalButton.Visibility = Visibility.Visible;
+
+                // Администрирование (левая панель)
                 SuppliersButton.Visibility = Visibility.Visible;
                 PurchasesButton.Visibility = Visibility.Visible;
-                RevenueReportButton.Visibility = Visibility.Visible;
-                ScheduleButton.Visibility = Visibility.Visible;
-                MaterialReportButton.Visibility = Visibility.Visible;
+
+                // Кнопка смены пароля
+                ChangePasswordButton.Visibility = Visibility.Visible;
             }
             else // Master
             {
-                // Мастер - только просмотр и отметка выполнения
+                // ========== МАСТЕР - ОГРАНИЧЕННЫЙ ДОСТУП ==========
+                // Вкладка Клиенты - только просмотр (без кнопок добавления/удаления)
                 AddClientButton.Visibility = Visibility.Collapsed;
                 EditClientButton.Visibility = Visibility.Collapsed;
                 DeleteClientButton.Visibility = Visibility.Collapsed;
                 RefreshClientsButton.Visibility = Visibility.Visible;
+
+                // Вкладка Услуги - только просмотр
                 AddServiceButton.Visibility = Visibility.Collapsed;
                 RefreshServicesButton.Visibility = Visibility.Visible;
+
+                // Вкладка Записи - только свои записи и отметка выполнения
                 AddAppointmentButton.Visibility = Visibility.Collapsed;
                 EditAppointmentButton.Visibility = Visibility.Collapsed;
                 CancelAppointmentButton.Visibility = Visibility.Collapsed;
                 ConfirmAppointmentButton.Visibility = Visibility.Collapsed;
-                CompleteAppointmentButton.Visibility = Visibility.Visible;
+                CompleteAppointmentButton.Visibility = Visibility.Visible;  // Мастер может отметить выполнение
                 RefreshAppointmentsButton.Visibility = Visibility.Visible;
+
+                // Отчёты - для мастера скрыты все
+                ReportsButton.Visibility = Visibility.Collapsed;
+                RevenueReportButton.Visibility = Visibility.Collapsed;
+                MaterialReportButton.Visibility = Visibility.Collapsed;
+                ScheduleButton.Visibility = Visibility.Visible;  // Мастер может смотреть свой график
+                JournalButton.Visibility = Visibility.Collapsed;
+
+                // Администрирование - полностью скрыто для мастера
                 SuppliersButton.Visibility = Visibility.Collapsed;
                 PurchasesButton.Visibility = Visibility.Collapsed;
-                RevenueReportButton.Visibility = Visibility.Collapsed;
-                ScheduleButton.Visibility = Visibility.Visible;
-                MaterialReportButton.Visibility = Visibility.Visible;
+
+                // Кнопка смены пароля доступна
+                ChangePasswordButton.Visibility = Visibility.Visible;
             }
         }
 
@@ -311,6 +339,7 @@ namespace SpaSalon.Views
             {
                 if (currentUser.Role == "Master")
                 {
+                    // Мастер видит только свои записи
                     var appointments = appointmentRepository.GetAppointmentsByMaster(currentUser.Id);
                     AppointmentsDataGrid.ItemsSource = appointments;
                 }
@@ -396,7 +425,15 @@ namespace SpaSalon.Views
                 return;
             }
 
-            if (selected.Status == "cancelled")
+            // Проверка - нельзя отменить выполненную запись
+            if (selected.Status == "выполнена")
+            {
+                MessageBox.Show("Нельзя отменить выполненную запись!", "Внимание",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (selected.Status == "отменена")
             {
                 MessageBox.Show("Запись уже отменена!", "Внимание",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -423,7 +460,6 @@ namespace SpaSalon.Views
                 }
             }
         }
-
         private void ConfirmAppointmentButton_Click(object sender, RoutedEventArgs e)
         {
             if (currentUser.Role != "Admin")
@@ -441,7 +477,23 @@ namespace SpaSalon.Views
                 return;
             }
 
-            if (selected.Status != "new")
+            // Нельзя подтвердить выполненную
+            if (selected.Status == "выполнена")
+            {
+                MessageBox.Show("Выполненную запись нельзя подтвердить!", "Внимание",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Нельзя подтвердить отменённую
+            if (selected.Status == "отменена")
+            {
+                MessageBox.Show("Отмененную запись нельзя подтвердить!", "Внимание",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (selected.Status != "новая")
             {
                 MessageBox.Show("Подтвердить можно только новую запись!", "Внимание",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -473,14 +525,16 @@ namespace SpaSalon.Views
                 return;
             }
 
-            if (selected.Status == "completed")
+            // Нельзя отметить уже выполненную
+            if (selected.Status == "выполнена")
             {
                 MessageBox.Show("Запись уже отмечена как выполненная!", "Внимание",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (selected.Status == "cancelled")
+            // Нельзя отметить отменённую
+            if (selected.Status == "отменена")
             {
                 MessageBox.Show("Отмененную запись нельзя отметить как выполненную!", "Внимание",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -500,9 +554,13 @@ namespace SpaSalon.Views
                     journalRepository.AddEntry(currentUser.Id, currentUser.FullName,
                         "Выполнение записи", $"Выполнена запись #{selected.Id} для {selected.ClientName}");
 
-                    var materialWindow = new MaterialConsumptionWindow(selected);
-                    materialWindow.Owner = this;
-                    materialWindow.ShowDialog();
+                    // Открываем окно учёта расхода материалов (только для админа)
+                    if (currentUser.Role == "Admin")
+                    {
+                        var materialWindow = new MaterialConsumptionWindow(selected);
+                        materialWindow.Owner = this;
+                        materialWindow.ShowDialog();
+                    }
                 }
                 else
                 {
@@ -527,6 +585,12 @@ namespace SpaSalon.Views
 
         private void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для просмотра отчётов!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var reportWindow = new ReportWindow();
             reportWindow.Owner = this;
             reportWindow.ShowDialog();
@@ -534,6 +598,12 @@ namespace SpaSalon.Views
 
         private void JournalButton_Click(object sender, RoutedEventArgs e)
         {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для просмотра журнала!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var journalWindow = new JournalWindow();
             journalWindow.Owner = this;
             journalWindow.ShowDialog();
@@ -567,6 +637,12 @@ namespace SpaSalon.Views
 
         private void MaterialReportButton_Click(object sender, RoutedEventArgs e)
         {
+            if (currentUser.Role != "Admin")
+            {
+                MessageBox.Show("У вас нет прав для просмотра отчёта по материалам!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var materialReportWindow = new MaterialReportWindow();
             materialReportWindow.Owner = this;
             materialReportWindow.ShowDialog();
@@ -587,6 +663,7 @@ namespace SpaSalon.Views
 
         private void ScheduleButton_Click(object sender, RoutedEventArgs e)
         {
+            // График доступен и администратору, и мастеру
             var scheduleWindow = new MasterScheduleWindow();
             scheduleWindow.Owner = this;
             scheduleWindow.ShowDialog();

@@ -3,8 +3,8 @@ using SpaSalon.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace SpaSalon.Views
 {
@@ -20,9 +20,13 @@ namespace SpaSalon.Views
         {
             InitializeComponent();
             this.appointment = appointment;
-            AppointmentInfoText.Text = $"{appointment.ClientName} - {appointment.ServiceName} ({appointment.DateTimeString})";
+
+            string serviceInfo = $"{appointment.ClientName} - {appointment.ServiceName} ({appointment.DateTimeString})";
+            AppointmentInfoText.Text = serviceInfo;
+
             LoadMaterials();
             LoadServiceMaterials();
+            LoadConsumedMaterials();
         }
 
         private void LoadMaterials()
@@ -34,15 +38,42 @@ namespace SpaSalon.Views
         private void LoadServiceMaterials()
         {
             serviceMaterials = materialRepository.GetServiceMaterials(appointment.ServiceId);
-            var serviceMaterialsWithNames = new List<dynamic>();
 
-            foreach (var sm in serviceMaterials)
+            if (serviceMaterials.Count > 0)
             {
-                var material = allMaterials.FirstOrDefault(m => m.Id == sm.MaterialId);
-                serviceMaterialsWithNames.Add(new { MaterialName = material?.Name ?? "Неизвестно", sm.QuantityNeeded });
-            }
+                var serviceMaterialsWithNames = new List<dynamic>();
 
-            ServiceMaterialsGrid.ItemsSource = serviceMaterialsWithNames;
+                foreach (var sm in serviceMaterials)
+                {
+                    var material = allMaterials.FirstOrDefault(m => m.Id == sm.MaterialId);
+                    serviceMaterialsWithNames.Add(new
+                    {
+                        MaterialName = material?.Name ?? "Неизвестно",
+                        sm.QuantityNeeded
+                    });
+                }
+
+                ServiceMaterialsGrid.ItemsSource = serviceMaterialsWithNames;
+                MaterialsExpander.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void LoadConsumedMaterials()
+        {
+            consumedMaterials = materialRepository.GetMaterialConsumptionByAppointment(appointment.Id);
+
+            if (consumedMaterials.Count > 0)
+            {
+                // Добавляем единицы измерения
+                foreach (var cm in consumedMaterials)
+                {
+                    var material = allMaterials.FirstOrDefault(m => m.Id == cm.MaterialId);
+                    cm.Unit = material?.Unit ?? "шт";
+                }
+
+                ConsumedMaterialsList.ItemsSource = consumedMaterials;
+                ConsumedExpander.Visibility = Visibility.Visible;
+            }
         }
 
         private void MaterialComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -51,7 +82,7 @@ namespace SpaSalon.Views
             {
                 var material = MaterialComboBox.SelectedItem as Material;
                 UnitText.Text = material.Unit;
-                AvailableText.Text = $"Доступно: {material.Quantity}";
+                AvailableText.Text = $"Доступно: {material.Quantity} {material.Unit}";
 
                 // Проверяем, есть ли этот материал в нормативах услуги
                 var serviceMaterial = serviceMaterials.FirstOrDefault(sm => sm.MaterialId == material.Id);
@@ -99,22 +130,26 @@ namespace SpaSalon.Views
                 if (materialRepository.RecordConsumption(appointment.Id, material.Id, quantity))
                 {
                     // Обновляем локальный список
-                    consumedMaterials.Add(new MaterialConsumption
+                    var newConsumption = new MaterialConsumption
                     {
                         MaterialId = material.Id,
                         MaterialName = material.Name,
                         QuantityUsed = quantity,
-                        ConsumptionDate = DateTime.Now
-                    });
+                        ConsumptionDate = DateTime.Now,
+                        Unit = material.Unit
+                    };
+                    consumedMaterials.Add(newConsumption);
 
                     ConsumedMaterialsList.ItemsSource = null;
                     ConsumedMaterialsList.ItemsSource = consumedMaterials;
+                    ConsumedExpander.Visibility = Visibility.Visible;
+                    ConsumedExpander.IsExpanded = true;
 
                     // Обновляем доступное количество
                     material.Quantity -= quantity;
-                    AvailableText.Text = $"Доступно: {material.Quantity}";
+                    AvailableText.Text = $"Доступно: {material.Quantity} {material.Unit}";
 
-                    ErrorTextBlock.Text = "Расход добавлен!";
+                    ErrorTextBlock.Text = "✓ Расход добавлен!";
                     ErrorTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
                     QuantityBox.Text = "1";

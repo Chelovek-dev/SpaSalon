@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Отчёт по выручке мастеров" 
         Height="550" 
-        Width="900"
+        Width="800"
         WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
@@ -35,9 +35,6 @@
                     <Button x:Name="GenerateReportButton" Content="Сформировать" Width="120" Height="30" 
                             Margin="20,0,0,0" Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand"
                             Click="GenerateReportButton_Click"/>
-                    <Button x:Name="ExportButton" Content="Экспорт в Excel" Width="120" Height="30" 
-                            Margin="10,0,0,0" Background="#27AE60" Foreground="White" BorderThickness="0" Cursor="Hand"
-                            Click="ExportButton_Click"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -46,9 +43,9 @@
         <DataGrid x:Name="RevenueDataGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                   AlternatingRowBackground="#F9F9F9">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Мастер" Binding="{Binding MasterName}" Width="200" FontWeight="Bold"/>
-                <DataGridTextColumn Header="Кол-во услуг" Binding="{Binding AppointmentsCount}" Width="120"/>
-                <DataGridTextColumn Header="Выручка" Binding="{Binding RevenueDisplay}" Width="150">
+                <DataGridTextColumn Header="Мастер" Binding="{Binding MasterName}" Width="250" FontWeight="Bold"/>
+                <DataGridTextColumn Header="Кол-во услуг" Binding="{Binding AppointmentsCount}" Width="150"/>
+                <DataGridTextColumn Header="Выручка" Binding="{Binding RevenueDisplay}" Width="200">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#27AE60"/>
@@ -56,8 +53,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Доля от общей" Binding="{Binding SharePercent}" Width="120"/>
-                <DataGridTextColumn Header="Средний чек" Binding="{Binding AverageCheck}" Width="120"/>
+                <DataGridTextColumn Header="Средний чек" Binding="{Binding AverageCheck}" Width="150"/>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -71,15 +67,15 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                     <TextBlock Text="Общая выручка" FontSize="12" Foreground="#BDC3C7"/>
-                    <TextBlock x:Name="TotalRevenueText" Text="0 ₽" FontSize="24" FontWeight="Bold" Foreground="#2ECC71"/>
+                    <TextBlock x:Name="TotalRevenueText" Text="0 ₽" FontSize="20" FontWeight="Bold" Foreground="#2ECC71"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                     <TextBlock Text="Всего услуг" FontSize="12" Foreground="#BDC3C7"/>
-                    <TextBlock x:Name="TotalAppointmentsText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#3498DB"/>
+                    <TextBlock x:Name="TotalAppointmentsText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#3498DB"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" HorizontalAlignment="Center">
                     <TextBlock Text="Средний чек" FontSize="12" Foreground="#BDC3C7"/>
-                    <TextBlock x:Name="AverageCheckText" Text="0 ₽" FontSize="24" FontWeight="Bold" Foreground="#F39C12"/>
+                    <TextBlock x:Name="AverageCheckText" Text="0 ₽" FontSize="20" FontWeight="Bold" Foreground="#F39C12"/>
                 </StackPanel>
             </Grid>
         </Border>

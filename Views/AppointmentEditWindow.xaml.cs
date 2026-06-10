@@ -28,6 +28,10 @@ namespace SpaSalon.Views
             InitializeComponent();
             LoadData();
 
+            // Устанавливаем минимальную дату - сегодня
+            DatePicker.DisplayDateStart = DateTime.Today;
+            DatePicker.BlackoutDates.Add(new CalendarDateRange(DateTime.MinValue, DateTime.Today.AddDays(-1)));
+
             if (appointment != null)
             {
                 isEdit = true;
@@ -63,6 +67,17 @@ namespace SpaSalon.Views
             ClientComboBox.SelectedValue = Appointment.ClientId;
             ServiceComboBox.SelectedValue = Appointment.ServiceId;
             MasterComboBox.SelectedValue = Appointment.MasterId;
+
+            // Проверка - нельзя редактировать запись на прошедшую дату
+            if (Appointment.DateTime.Date < DateTime.Today && !isEdit)
+            {
+                MessageBox.Show("Нельзя редактировать запись на прошедшую дату!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                DialogResult = false;
+                Close();
+                return;
+            }
+
             DatePicker.SelectedDate = Appointment.DateTime.Date;
 
             string timeSlot = Appointment.DateTime.ToString("HH:mm");
@@ -71,17 +86,20 @@ namespace SpaSalon.Views
 
             switch (Appointment.Status)
             {
-                case "new":
+                case "новая":
                     StatusComboBox.SelectedIndex = 0;
                     break;
-                case "confirmed":
+                case "подтверждена":
                     StatusComboBox.SelectedIndex = 1;
                     break;
-                case "completed":
+                case "выполнена":
                     StatusComboBox.SelectedIndex = 2;
                     break;
-                case "cancelled":
+                case "отменена":
                     StatusComboBox.SelectedIndex = 3;
+                    break;
+                default:
+                    StatusComboBox.SelectedIndex = 0;
                     break;
             }
         }
@@ -110,33 +128,22 @@ namespace SpaSalon.Views
                 if (selectedService != null)
                 {
                     selectedServiceDuration = selectedService.Duration;
-                    ServiceDurationText.Text = $"Длительность: {selectedService.Duration} мин";
+                    ServiceDurationText.Text = $"⏱️ Длительность: {selectedService.Duration} минут";
                 }
             }
         }
 
-        private async void DatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private void DatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DatePicker.SelectedDate.HasValue && MasterComboBox.SelectedItem != null)
+            // Проверка при смене даты
+            if (DatePicker.SelectedDate.HasValue && DatePicker.SelectedDate.Value.Date < DateTime.Today)
             {
-                var master = MasterComboBox.SelectedItem as User;
-                if (master != null)
-                {
-                    var busySlots = await System.Threading.Tasks.Task.Run(() =>
-                        appointmentRepository.GetMasterBusySlots(master.Id, DatePicker.SelectedDate.Value));
-
-                    // Подсветка занятых слотов
-                    HighlightBusySlots(busySlots);
-                }
+                ErrorTextBlock.Text = "❌ Нельзя записаться на прошедшую дату!";
+                DatePicker.SelectedDate = DateTime.Today;
             }
-        }
-
-        private void HighlightBusySlots(List<DateTime> busySlots)
-        {
-            // Сброс подсветки
-            foreach (var item in TimeComboBox.Items)
+            else
             {
-                // Простая проверка - можно расширить
+                ErrorTextBlock.Text = "";
             }
         }
 
@@ -171,16 +178,31 @@ namespace SpaSalon.Views
                     return;
                 }
 
+                // ========== ГЛАВНАЯ ПРОВЕРКА: НЕЛЬЗЯ ЗАПИСЫВАТЬСЯ НА ПРОШЕДШУЮ ДАТУ ==========
+                DateTime selectedDate = DatePicker.SelectedDate.Value;
+                if (selectedDate.Date < DateTime.Today.Date)
+                {
+                    ErrorTextBlock.Text = "❌ Нельзя записаться на прошедшую дату! Выберите сегодня или позже.";
+                    return;
+                }
+
                 var client = ClientComboBox.SelectedItem as Client;
                 var service = ServiceComboBox.SelectedItem as Service;
                 var master = MasterComboBox.SelectedItem as User;
 
                 string selectedTime = TimeComboBox.SelectedItem.ToString();
-                DateTime dateTime = DatePicker.SelectedDate.Value;
+                DateTime dateTime = selectedDate;
                 dateTime = dateTime.AddHours(int.Parse(selectedTime.Substring(0, 2)));
                 dateTime = dateTime.AddMinutes(int.Parse(selectedTime.Substring(3, 2)));
 
-                // Проверка занятости мастера с учётом длительности услуги
+                // Проверка - если выбранная дата/время уже прошли
+                if (dateTime < DateTime.Now)
+                {
+                    ErrorTextBlock.Text = "❌ Нельзя записаться на прошедшее время! Выберите будущее время.";
+                    return;
+                }
+
+                // Проверка занятости мастера
                 bool isAvailable = appointmentRepository.CheckMasterAvailability(
                     master.Id, dateTime, service.Duration, isEdit ? (int?)Appointment.Id : null);
 
@@ -211,11 +233,15 @@ namespace SpaSalon.Views
                         {
                             Appointment.Status = selectedStatus.Tag.ToString();
                         }
+                        else
+                        {
+                            Appointment.Status = "новая";
+                        }
                     }
                 }
                 else
                 {
-                    Appointment.Status = "new";
+                    Appointment.Status = "новая";
                 }
 
                 DialogResult = true;

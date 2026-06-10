@@ -13,7 +13,7 @@ namespace SpaSalon.Views
         {
             InitializeComponent();
             LoginTextBox.Text = "+7 (999) 111-22-33";
-            PasswordBox.Password = "123g54w";  // Исправленный пароль из БД
+            PasswordBox.Password = "admin";  // Исправленный пароль из БД
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)

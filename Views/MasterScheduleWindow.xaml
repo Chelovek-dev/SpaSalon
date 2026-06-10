@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Календарь занятости мастеров" 
         Height="600" 
-        Width="1000"
+        Width="1100"
         WindowStartupLocation="CenterOwner">
 
     <Grid Margin="10">
@@ -11,95 +11,154 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="📅 Календарь занятости мастеров" FontSize="22" FontWeight="Bold" 
                    HorizontalAlignment="Center" Margin="0,0,0,15"/>
 
         <!-- Панель управления -->
-        <Border Grid.Row="1" Background="#F0F0F0" Padding="10" Margin="0,0,0,10" CornerRadius="5">
+        <Border Grid.Row="1" Background="#F0F0F0" Padding="10" Margin="0,0,0,10" CornerRadius="8">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="PrevWeekButton" Content="◀ Предыдущая неделя" Width="150" Height="35" 
+                <Button x:Name="PrevWeekButton" Content="◀ Предыдущая неделя" Width="140" Height="35" 
                         Margin="5" Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand"
                         Click="PrevWeekButton_Click"/>
                 <DatePicker x:Name="CurrentDatePicker" Width="130" Height="35" 
                             SelectedDateChanged="CurrentDatePicker_SelectedDateChanged"/>
-                <Button x:Name="NextWeekButton" Content="Следующая неделя ▶" Width="150" Height="35" 
+                <Button x:Name="NextWeekButton" Content="Следующая неделя ▶" Width="140" Height="35" 
                         Margin="5" Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand"
                         Click="NextWeekButton_Click"/>
-                <Button x:Name="TodayButton" Content="Сегодня" Width="100" Height="35" 
+                <Button x:Name="TodayButton" Content="Сегодня" Width="90" Height="35" 
                         Margin="5" Background="#27AE60" Foreground="White" BorderThickness="0" Cursor="Hand"
                         Click="TodayButton_Click"/>
-                <ComboBox x:Name="MasterFilterComboBox" Width="200" Height="35" Margin="20,0,0,0"
+                <ComboBox x:Name="MasterFilterComboBox" Width="180" Height="35" Margin="20,0,0,0"
                           DisplayMemberPath="FullName" SelectedValuePath="Id"
                           SelectionChanged="MasterFilterComboBox_SelectionChanged"/>
             </StackPanel>
         </Border>
 
         <!-- Календарь -->
-        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsControl x:Name="ScheduleItemsControl">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="#DDD" BorderThickness="0,0,0,1" Padding="5">
-                            <Grid>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовки дней недели -->
+                <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Background="#2C3E50" Padding="10" CornerRadius="5">
+                        <TextBlock Text="Время" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="1" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day0Header" Text="ПН" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="2" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day1Header" Text="ВТ" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="3" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day2Header" Text="СР" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="4" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day3Header" Text="ЧТ" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="5" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day4Header" Text="ПТ" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="6" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day5Header" Text="СБ" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="7" Background="#2C3E50" Padding="10" CornerRadius="5" Margin="2,0">
+                        <TextBlock x:Name="Day6Header" Text="ВС" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Строки с временем -->
+                <ItemsControl x:Name="ScheduleItemsControl" Grid.Row="1">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- Время -->
-                                <Border Grid.Column="0" Background="#2C3E50" CornerRadius="5" Margin="2">
-                                    <TextBlock Text="{Binding TimeSlot}" HorizontalAlignment="Center" 
-                                               VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                                <Border Grid.Column="0" Background="#ECF0F1" Padding="8" CornerRadius="5" BorderBrush="#BDC3C7" BorderThickness="1">
+                                    <TextBlock Text="{Binding TimeSlot}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                                 </Border>
 
-                                <!-- Занятость мастеров -->
-                                <WrapPanel Grid.Column="1" Margin="5,0">
-                                    <ItemsControl ItemsSource="{Binding Appointments}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Background="{Binding Color}" CornerRadius="5" 
-                                                        Margin="3" Padding="8,3" Cursor="Hand"
-                                                        ToolTip="{Binding Tooltip}">
-                                                    <TextBlock Text="{Binding DisplayText}" Foreground="White" FontSize="11"/>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </WrapPanel>
+                                <!-- ПН -->
+                                <Border Grid.Column="1" Background="{Binding Day0Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day0Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- ВТ -->
+                                <Border Grid.Column="2" Background="{Binding Day1Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day1Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- СР -->
+                                <Border Grid.Column="3" Background="{Binding Day2Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day2Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- ЧТ -->
+                                <Border Grid.Column="4" Background="{Binding Day3Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day3Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- ПТ -->
+                                <Border Grid.Column="5" Background="{Binding Day4Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day4Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- СБ -->
+                                <Border Grid.Column="6" Background="{Binding Day5Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day5Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- ВС -->
+                                <Border Grid.Column="7" Background="{Binding Day6Color}" CornerRadius="5" Margin="2,0" Padding="5">
+                                    <TextBlock Text="{Binding Day6Text}" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Border>
                             </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
         </ScrollViewer>
 
         <!-- Легенда -->
-        <Border Grid.Row="3" Background="#F9F9F9" Padding="10" Margin="0,10,0,0" CornerRadius="5">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Легенда:" FontWeight="Bold" Margin="0,0,10,0"/>
-                <Border Background="#FF9800" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                <TextBlock Text="Новая запись" Margin="0,0,15,0"/>
-                <Border Background="#4CAF50" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                <TextBlock Text="Подтверждена" Margin="0,0,15,0"/>
-                <Border Background="#2196F3" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                <TextBlock Text="Выполнена" Margin="0,0,15,0"/>
-                <Border Background="#F44336" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                <TextBlock Text="Отменена" Margin="0,0,15,0"/>
-                <Border Background="#E0E0E0" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                <TextBlock Text="Свободно" Margin="0,0,15,0"/>
-            </StackPanel>
+        <Border Grid.Row="3" Background="#F9F9F9" Padding="10" Margin="0,10,0,0" CornerRadius="8">
+            <WrapPanel>
+                <TextBlock Text="Легенда:" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <Border Background="#FF9800" Width="16" Height="16" CornerRadius="3" Margin="0,0,5,0"/>
+                <TextBlock Text="Новая" Margin="0,0,15,0" FontSize="11"/>
+                <Border Background="#4CAF50" Width="16" Height="16" CornerRadius="3" Margin="0,0,5,0"/>
+                <TextBlock Text="Подтверждена" Margin="0,0,15,0" FontSize="11"/>
+                <Border Background="#2196F3" Width="16" Height="16" CornerRadius="3" Margin="0,0,5,0"/>
+                <TextBlock Text="Выполнена" Margin="0,0,15,0" FontSize="11"/>
+                <Border Background="#F44336" Width="16" Height="16" CornerRadius="3" Margin="0,0,5,0"/>
+                <TextBlock Text="Отменена" Margin="0,0,15,0" FontSize="11"/>
+                <Border Background="#E0E0E0" Width="16" Height="16" CornerRadius="3" Margin="0,0,5,0"/>
+                <TextBlock Text="Свободно" Margin="0,0,15,0" FontSize="11"/>
+            </WrapPanel>
         </Border>
     </Grid>
 </Window>

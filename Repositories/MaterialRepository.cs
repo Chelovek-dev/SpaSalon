@@ -69,19 +69,6 @@ namespace SpaSalon.Repositories
             return db.ExecuteNonQuery(query, parameters) > 0;
         }
 
-        public bool AddMaterial(Material material)
-        {
-            string query = "INSERT INTO `расходные материалы` (`наименование`, `единица измерения`, `колво на складе`, `срок годности`) VALUES (@name, @unit, @quantity, @expiration)";
-            var parameters = new MySqlParameter[]
-            {
-                new MySqlParameter("@name", material.Name),
-                new MySqlParameter("@unit", material.Unit),
-                new MySqlParameter("@quantity", material.Quantity),
-                new MySqlParameter("@expiration", material.ExpirationDays ?? (object)DBNull.Value)
-            };
-            return db.ExecuteNonQuery(query, parameters) > 0;
-        }
-
         public bool ConsumeMaterial(int materialId, int quantity)
         {
             var material = GetMaterialById(materialId);
@@ -94,127 +81,149 @@ namespace SpaSalon.Repositories
         public List<ServiceMaterial> GetServiceMaterials(int serviceId)
         {
             var serviceMaterials = new List<ServiceMaterial>();
-            // Создаём таблицу связи услуг и материалов, если её нет
-            string createTableQuery = @"
-                CREATE TABLE IF NOT EXISTS `услуги_материалы` (
-                    `id` INT NOT NULL AUTO_INCREMENT,
-                    `service_id` INT NOT NULL,
-                    `material_id` INT NOT NULL,
-                    `quantity_needed` INT NOT NULL,
-                    PRIMARY KEY (`id`),
-                    FOREIGN KEY (`service_id`) REFERENCES `услуги`(`код услуги`),
-                    FOREIGN KEY (`material_id`) REFERENCES `расходные материалы`(`код материала`)
-                )";
 
-            db.ExecuteNonQuery(createTableQuery);
-
-            string query = @"SELECT um.*, m.`наименование` as MaterialName 
-                            FROM `услуги_материалы` um
-                            JOIN `расходные материалы` m ON um.material_id = m.`код материала`
-                            WHERE um.service_id = @serviceId";
-
-            var parameters = new MySqlParameter[]
+            try
             {
-                new MySqlParameter("@serviceId", serviceId)
-            };
+                // Проверяем, существует ли таблица расход_услуг
+                string checkTableQuery = "SHOW TABLES LIKE 'расход_услуг'";
+                DataTable tableExists = db.ExecuteQuery(checkTableQuery);
 
-            DataTable result = db.ExecuteQuery(query, parameters);
-
-            foreach (DataRow row in result.Rows)
-            {
-                serviceMaterials.Add(new ServiceMaterial
+                if (tableExists.Rows.Count == 0)
                 {
-                    Id = Convert.ToInt32(row["id"]),
-                    ServiceId = Convert.ToInt32(row["service_id"]),
-                    MaterialId = Convert.ToInt32(row["material_id"]),
-                    QuantityNeeded = Convert.ToInt32(row["quantity_needed"])
-                });
+                    // Таблицы нет - возвращаем пустой список
+                    return serviceMaterials;
+                }
+
+                string query = @"SELECT ru.`код расхода` as Id, ru.`код услуги` as ServiceId, 
+                                        ru.`код материала` as MaterialId, ru.`количество` as QuantityNeeded,
+                                        m.`наименование` as MaterialName
+                                FROM `расход_услуг` ru
+                                JOIN `расходные материалы` m ON ru.`код материала` = m.`код материала`
+                                WHERE ru.`код услуги` = @serviceId";
+
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@serviceId", serviceId)
+                };
+
+                DataTable result = db.ExecuteQuery(query, parameters);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    serviceMaterials.Add(new ServiceMaterial
+                    {
+                        Id = Convert.ToInt32(row["Id"]),
+                        ServiceId = Convert.ToInt32(row["ServiceId"]),
+                        MaterialId = Convert.ToInt32(row["MaterialId"]),
+                        MaterialName = row["MaterialName"].ToString(),
+                        QuantityNeeded = Convert.ToInt32(row["QuantityNeeded"])
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка GetServiceMaterials: {ex.Message}");
+            }
+
             return serviceMaterials;
         }
 
         public bool AddServiceMaterial(int serviceId, int materialId, int quantityNeeded)
         {
-            string query = "INSERT INTO `услуги_материалы` (`service_id`, `material_id`, `quantity_needed`) VALUES (@serviceId, @materialId, @quantity)";
-            var parameters = new MySqlParameter[]
+            try
             {
-                new MySqlParameter("@serviceId", serviceId),
-                new MySqlParameter("@materialId", materialId),
-                new MySqlParameter("@quantity", quantityNeeded)
-            };
-            return db.ExecuteNonQuery(query, parameters) > 0;
-        }
-
-        public bool RemoveServiceMaterial(int serviceMaterialId)
-        {
-            string query = "DELETE FROM `услуги_материалы` WHERE `id` = @id";
-            var parameters = new MySqlParameter[]
+                string query = "INSERT INTO `расход_услуг` (`код услуги`, `код материала`, `количество`) VALUES (@serviceId, @materialId, @quantity)";
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@serviceId", serviceId),
+                    new MySqlParameter("@materialId", materialId),
+                    new MySqlParameter("@quantity", quantityNeeded)
+                };
+                return db.ExecuteNonQuery(query, parameters) > 0;
+            }
+            catch (Exception ex)
             {
-                new MySqlParameter("@id", serviceMaterialId)
-            };
-            return db.ExecuteNonQuery(query, parameters) > 0;
+                System.Diagnostics.Debug.WriteLine($"Ошибка AddServiceMaterial: {ex.Message}");
+                return false;
+            }
         }
 
         public bool RecordConsumption(int appointmentId, int materialId, int quantityUsed)
         {
-            string createTableQuery = @"
-                CREATE TABLE IF NOT EXISTS `расход_материалов` (
-                    `id` INT NOT NULL AUTO_INCREMENT,
-                    `appointment_id` INT NOT NULL,
-                    `material_id` INT NOT NULL,
-                    `quantity_used` INT NOT NULL,
-                    `consumption_date` DATETIME NOT NULL,
-                    PRIMARY KEY (`id`)
-                )";
-
-            db.ExecuteNonQuery(createTableQuery);
-
-            string query = @"INSERT INTO `расход_материалов` 
-                            (`appointment_id`, `material_id`, `quantity_used`, `consumption_date`) 
-                            VALUES (@appointmentId, @materialId, @quantity, @consumptionDate)";
-
-            var parameters = new MySqlParameter[]
+            try
             {
-                new MySqlParameter("@appointmentId", appointmentId),
-                new MySqlParameter("@materialId", materialId),
-                new MySqlParameter("@quantity", quantityUsed),
-                new MySqlParameter("@consumptionDate", DateTime.Now)
-            };
+                // Создаём таблицу для расхода материалов, если её нет
+                string createTableQuery = @"
+                    CREATE TABLE IF NOT EXISTS `расход_материалов` (
+                        `id` INT NOT NULL AUTO_INCREMENT,
+                        `appointment_id` INT NOT NULL,
+                        `material_id` INT NOT NULL,
+                        `quantity_used` INT NOT NULL,
+                        `consumption_date` DATETIME NOT NULL,
+                        PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
-            bool result = db.ExecuteNonQuery(query, parameters) > 0;
-            if (result)
-            {
-                ConsumeMaterial(materialId, quantityUsed);
+                db.ExecuteNonQuery(createTableQuery);
+
+                string query = @"INSERT INTO `расход_материалов` 
+                                (`appointment_id`, `material_id`, `quantity_used`, `consumption_date`) 
+                                VALUES (@appointmentId, @materialId, @quantity, @consumptionDate)";
+
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@appointmentId", appointmentId),
+                    new MySqlParameter("@materialId", materialId),
+                    new MySqlParameter("@quantity", quantityUsed),
+                    new MySqlParameter("@consumptionDate", DateTime.Now)
+                };
+
+                bool result = db.ExecuteNonQuery(query, parameters) > 0;
+                if (result)
+                {
+                    ConsumeMaterial(materialId, quantityUsed);
+                }
+                return result;
             }
-            return result;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка RecordConsumption: {ex.Message}");
+                return false;
+            }
         }
 
         public List<MaterialConsumption> GetMaterialConsumptionByAppointment(int appointmentId)
         {
             var consumptions = new List<MaterialConsumption>();
-            string query = @"SELECT rc.*, m.`наименование` as MaterialName 
-                            FROM `расход_материалов` rc
-                            JOIN `расходные материалы` m ON rc.material_id = m.`код материала`
-                            WHERE rc.appointment_id = @appointmentId";
-
-            var parameters = new MySqlParameter[]
+            try
             {
-                new MySqlParameter("@appointmentId", appointmentId)
-            };
+                string query = @"SELECT rc.*, m.`наименование` as MaterialName 
+                                FROM `расход_материалов` rc
+                                JOIN `расходные материалы` m ON rc.material_id = m.`код материала`
+                                WHERE rc.appointment_id = @appointmentId";
 
-            DataTable result = db.ExecuteQuery(query, parameters);
-
-            foreach (DataRow row in result.Rows)
-            {
-                consumptions.Add(new MaterialConsumption
+                var parameters = new MySqlParameter[]
                 {
-                    Id = Convert.ToInt32(row["id"]),
-                    AppointmentId = Convert.ToInt32(row["appointment_id"]),
-                    MaterialId = Convert.ToInt32(row["material_id"]),
-                    MaterialName = row["MaterialName"].ToString(),
-                    QuantityUsed = Convert.ToInt32(row["quantity_used"]),
-                    ConsumptionDate = Convert.ToDateTime(row["consumption_date"])
-                });
+                    new MySqlParameter("@appointmentId", appointmentId)
+                };
+
+                DataTable result = db.ExecuteQuery(query, parameters);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    consumptions.Add(new MaterialConsumption
+                    {
+                        Id = Convert.ToInt32(row["id"]),
+                        AppointmentId = Convert.ToInt32(row["appointment_id"]),
+                        MaterialId = Convert.ToInt32(row["material_id"]),
+                        MaterialName = row["MaterialName"].ToString(),
+                        QuantityUsed = Convert.ToInt32(row["quantity_used"]),
+                        ConsumptionDate = Convert.ToDateTime(row["consumption_date"])
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка GetMaterialConsumptionByAppointment: {ex.Message}");
             }
             return consumptions;
         }
